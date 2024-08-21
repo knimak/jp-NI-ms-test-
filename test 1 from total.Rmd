@@ -1,0 +1,1550 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-05-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(gghalves)
+library(ggrepel)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+Normalised_NC_log2<- filtered_data2_NC %>%
+ mutate(NC_R1_P = log2(NC_R1_P) ,
+         NC_R1_5 = log2(NC_R1_5),
+         NC_R1_6 =log2(NC_R1_6 ),
+         NC_R2_P = log2(NC_R2_P) ,
+         NC_R2_5 = log2(NC_R2_5 ),
+         NC_R2_6 =log2(NC_R2_6 ),
+         NC_R3_P = log2(NC_R3_P ),
+         NC_R3_5 = log2(NC_R3_5 ),
+         NC_R3_6 =log2(NC_R3_6 ))
+
+Normalised_NC_log2andtotal <- filtered_data2_NC %>%
+ mutate(NC_R1_P = log2(NC_R1_P) * 0.9882551,
+         NC_R1_5 = log2(NC_R1_5) * 0.9903224,
+         NC_R1_6 =log2(NC_R1_6 )*0.9941706,
+         NC_R2_P = log2(NC_R2_P) * 1.019031,
+         NC_R2_5 = log2(NC_R2_5 )* 1.005729,
+         NC_R2_6 =log2(NC_R2_6 )* 1.011879,
+         NC_R3_P = log2(NC_R3_P )* 0.9960172,
+         NC_R3_5 = log2(NC_R3_5 )* 0.9994429,
+         NC_R3_6 =log2(NC_R3_6 )* 0.9959804)
+
+Normalised_NC_totalandlog2 <- filtered_data2_NC %>%
+ mutate(NC_R1_P = log2(NC_R1_P * 0.753537),
+         NC_R1_5 = log2(NC_R1_5 * 0.7966058),
+         NC_R1_6 =log2(NC_R1_6 *0.8829002),
+         NC_R2_P = log2(NC_R2_P * 1.68403),
+         NC_R2_5 = log2(NC_R2_5 * 1.196802),
+         NC_R2_6 =log2(NC_R2_6 * 1.403067),
+         NC_R3_P = log2(NC_R3_P * 0.9273066),
+         NC_R3_5 = log2(NC_R3_5 * 1.015196),
+         NC_R3_6 =log2(NC_R3_6 * 0.9264013))
+
+```
+
+```{r}
+H3inNC <- c("H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8")
+H3inNCtable <- subset(Normalised_NC_log2, Gene %in% H3inNC )
+
+totalsampleNCH3 <- sum(H3inNCtable$NC_R1_P, na.rm = TRUE)+
+sum(H3inNCtable$NC_R2_P, na.rm = TRUE)+
+sum(H3inNCtable$NC_R3_P, na.rm = TRUE)+
+  sum(H3inNCtable$NC_R1_5, na.rm = TRUE)+
+ sum(H3inNCtable$NC_R2_5, na.rm = TRUE)+
+  sum(H3inNCtable$NC_R3_5, na.rm = TRUE)+
+   sum(H3inNCtable$NC_R1_6, na.rm = TRUE)+
+  sum(H3inNCtable$NC_R2_6, na.rm = TRUE)+
+   sum(H3inNCtable$NC_R3_6, na.rm = TRUE)
+
+average_NC_based_ontotal_H3 <- totalsampleNCH3/9
+print(average_NC_based_ontotal_H3)
+
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R1_P, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R1_5, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R1_6, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R2_P, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R2_5, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R2_6, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R3_P, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R3_5, na.rm = TRUE)
+average_NC_based_ontotal_H3/sum(H3inNCtable$NC_R3_6, na.rm = TRUE)
+
+
+
+
+Normalised_NC_log2andH3 <- Normalised_NC_log2 %>%
+ mutate(NC_R1_P = NC_R1_P * 0.99,
+         NC_R1_5 = NC_R1_5 * 0.99,
+         NC_R1_6 =NC_R1_6 *0.993,
+         NC_R2_P = NC_R2_P * 1.01,
+         NC_R2_5 = NC_R2_5 * 1.00,
+         NC_R2_6 =NC_R2_6 * 1.01,
+         NC_R3_P = NC_R3_P * 0.99,
+         NC_R3_5 = NC_R3_5 * 0.99,
+         NC_R3_6 =NC_R3_6 * 0.998)
+```
+```{r}
+	H4inNC <- c("H4C1; H4C11; H4C12; H4C13; H4C14; H4C15; H4C16; H4C2; H4C3; H4C4; H4C5; H4C6; H4C8; H4C9")
+H4inNCtable <- subset(Normalised_NC_log2, Gene %in% H4inNC )
+
+totalsampleNCH4 <- sum(H4inNCtable$NC_R1_P, na.rm = TRUE)+
+sum(H4inNCtable$NC_R2_P, na.rm = TRUE)+
+sum(H4inNCtable$NC_R3_P, na.rm = TRUE)+
+  sum(H4inNCtable$NC_R1_5, na.rm = TRUE)+
+ sum(H4inNCtable$NC_R2_5, na.rm = TRUE)+
+  sum(H4inNCtable$NC_R3_5, na.rm = TRUE)+
+   sum(H4inNCtable$NC_R1_6, na.rm = TRUE)+
+  sum(H4inNCtable$NC_R2_6, na.rm = TRUE)+
+   sum(H4inNCtable$NC_R3_6, na.rm = TRUE)
+
+average_NC_based_ontotal_H4 <- totalsampleNCH4/9
+print(average_NC_based_ontotal_H4)
+
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R1_P, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R1_5, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R1_6, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R2_P, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R2_5, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R2_6, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R3_P, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R3_5, na.rm = TRUE)
+average_NC_based_ontotal_H4/sum(H4inNCtable$NC_R3_6, na.rm = TRUE)
+
+
+Normalised_NC_log2andH4 <- Normalised_NC_log2 %>%
+ mutate(NC_R1_P = NC_R1_P * 0.9921881,
+         NC_R1_5 = NC_R1_5 * 0.99071,
+         NC_R1_6 =NC_R1_6 *1.008233,
+         NC_R2_P = NC_R2_P * 1.016623,
+         NC_R2_5 = NC_R2_5 * 1.001393,
+         NC_R2_6 =NC_R2_6 * 1.01024,
+         NC_R3_P = NC_R3_P * 0.9930643,
+         NC_R3_5 = NC_R3_5 * 0.9925477,
+         NC_R3_6 =NC_R3_6 * 0.9957168)
+ 
+
+```
+
+
+```{r}
+FBLinNC <- c("FBL")
+FBLinNCtable <- subset(Normalised_NC_totalandlog2, Gene %in% FBLinNC )
+
+
+totalsampleNCFBL <- sum(FBLinNCtable$NC_R1_P, na.rm = TRUE)+
+sum(FBLinNCtable$NC_R2_P, na.rm = TRUE)+
+sum(FBLinNCtable$NC_R3_P, na.rm = TRUE)+
+  sum(FBLinNCtable$NC_R1_5, na.rm = TRUE)+
+ sum(FBLinNCtable$NC_R2_5, na.rm = TRUE)+
+  sum(FBLinNCtable$NC_R3_5, na.rm = TRUE)+
+   sum(FBLinNCtable$NC_R1_6, na.rm = TRUE)+
+  sum(FBLinNCtable$NC_R2_6, na.rm = TRUE)+
+   sum(FBLinNCtable$NC_R3_6, na.rm = TRUE)
+
+average_NC_based_ontotal_FBL <- totalsampleNCFBL/9
+print(average_NC_based_ontotal_FBL)
+
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R1_P, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R1_5, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R1_6, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R2_P, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R2_5, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R2_6, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R3_P, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R3_5, na.rm = TRUE)
+average_NC_based_ontotal_FBL/sum(FBLinNCtable$NC_R3_6, na.rm = TRUE)
+
+
+
+Normalised_NC_log2andFBL <- Normalised_NC_log2 %>%
+ mutate(NC_R1_P = NC_R1_P * 1.000626,
+         NC_R1_5 = NC_R1_5 * 1.004211,
+         NC_R1_6 =NC_R1_6 *1.007849,
+         NC_R2_P = NC_R2_P * 0.9967032,
+         NC_R2_5 = NC_R2_5 * 0.9921093,
+         NC_R2_6 =NC_R2_6 * 0.9970906,
+         NC_R3_P = NC_R3_P * 1.00365,
+         NC_R3_5 = NC_R3_5 * 0.994963,
+         NC_R3_6 =NC_R3_6 * 1.003007)
+
+
+
+
+
+Normalised_NC_log2andtotalandFBL <- Normalised_NC_log2andtotal %>%
+ mutate(NC_R1_P = NC_R1_P * 1.000626,
+         NC_R1_5 = NC_R1_5 * 1.004211,
+         NC_R1_6 =NC_R1_6 *1.007849,
+         NC_R2_P = NC_R2_P * 0.9967032,
+         NC_R2_5 = NC_R2_5 * 0.9921093,
+         NC_R2_6 =NC_R2_6 * 0.9970906,
+         NC_R3_P = NC_R3_P * 1.00365,
+         NC_R3_5 = NC_R3_5 * 0.994963,
+         NC_R3_6 =NC_R3_6 * 1.003007)
+
+Normalised_NC_log2andtotalandFBLandziji <- Normalised_NC_log2andtotal %>%
+ mutate(NC_R1_P = NC_R1_P * 1.012641,
+         NC_R1_5 = NC_R1_5 * 1.014147,
+         NC_R1_6 =NC_R1_6 *1.013881,
+         NC_R2_P = NC_R2_P * 0.9782074,
+         NC_R2_5 = NC_R2_5 * 0.9865771,
+         NC_R2_6 =NC_R2_6 * 0.9855044,
+         NC_R3_P = NC_R3_P * 1.007785,
+         NC_R3_5 = NC_R3_5 * 0.9956379,
+         NC_R3_6 =NC_R3_6 * 1.007177)
+
+Normalised_NC_totalandlog2andFBL <- Normalised_NC_totalandlog2 %>%
+ mutate(NC_R1_P = NC_R1_P * 1.000626,
+         NC_R1_5 = NC_R1_5 * 1.004211,
+         NC_R1_6 =NC_R1_6 *1.007849,
+         NC_R2_P = NC_R2_P * 0.9967032,
+         NC_R2_5 = NC_R2_5 * 0.9921093,
+         NC_R2_6 =NC_R2_6 * 0.9970906,
+         NC_R3_P = NC_R3_P * 1.00365,
+         NC_R3_5 = NC_R3_5 * 0.994963,
+         NC_R3_6 =NC_R3_6 * 1.003007)
+
+Normalised_NC_totalandlog2andFBLandziji <- Normalised_NC_totalandlog2 %>%
+ mutate(NC_R1_P = NC_R1_P * 1.016462,
+         NC_R1_5 = NC_R1_5 * 1.017284,
+         NC_R1_6 =NC_R1_6 *1.015701,
+         NC_R2_P = NC_R2_P * 0.9729793,
+         NC_R2_5 = NC_R2_5 * 0.9848285,
+         NC_R2_6 =NC_R2_6 * 0.9820348,
+         NC_R3_P = NC_R3_P * 1.00895,
+         NC_R3_5 = NC_R3_5 * 0.9956939,
+         NC_R3_6 =NC_R3_6 * 1.00835)
+
+```
+
+
+```{r}
+
+
+UBTFinNC <- c("UBTF")
+UBTFinNCtable <- subset(Normalised_NC_log2andtotal, Gene %in% UBTFinNC )
+
+
+totalsampleNCUBTF <- sum(UBTFinNCtable$NC_R1_P, na.rm = TRUE)+
+sum(UBTFinNCtable$NC_R2_P, na.rm = TRUE)+
+sum(UBTFinNCtable$NC_R3_P, na.rm = TRUE)+
+  sum(UBTFinNCtable$NC_R1_5, na.rm = TRUE)+
+ sum(UBTFinNCtable$NC_R2_5, na.rm = TRUE)+
+  sum(UBTFinNCtable$NC_R3_5, na.rm = TRUE)+
+   sum(UBTFinNCtable$NC_R1_6, na.rm = TRUE)+
+  sum(UBTFinNCtable$NC_R2_6, na.rm = TRUE)+
+   sum(UBTFinNCtable$NC_R3_6, na.rm = TRUE)
+
+average_NC_based_ontotal_UBTF <- totalsampleNCUBTF/9
+print(average_NC_based_ontotal_UBTF)
+
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R1_P, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R1_5, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R1_6, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R2_P, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R2_5, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R2_6, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R3_P, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R3_5, na.rm = TRUE)
+average_NC_based_ontotal_UBTF/sum(UBTFinNCtable$NC_R3_6, na.rm = TRUE)
+
+Normalised_NC_log2andUBTF <- Normalised_NC_log2 %>%
+ mutate(NC_R1_P = NC_R1_P * 0.9997758,
+         NC_R1_5 = NC_R1_5 * 1.004139,
+         NC_R1_6 =NC_R1_6 *1.008089,
+         NC_R2_P = NC_R2_P * 0.9971099,
+         NC_R2_5 = NC_R2_5 * 1.002148,
+         NC_R2_6 =NC_R2_6 * 0.9957758,
+         NC_R3_P = NC_R3_P * 0.9946781,
+         NC_R3_5 = NC_R3_5 * 1.001355,
+         NC_R3_6 =NC_R3_6 * 0.9970812)
+
+Normalised_NC_totalandlog2andUBTF <- Normalised_NC_totalandlog2 %>%
+ mutate(NC_R1_P = NC_R1_P * 0.9997758,
+         NC_R1_5 = NC_R1_5 * 1.004139,
+         NC_R1_6 =NC_R1_6 *1.008089,
+         NC_R2_P = NC_R2_P * 0.9971099,
+         NC_R2_5 = NC_R2_5 * 1.002148,
+         NC_R2_6 =NC_R2_6 * 0.9957758,
+         NC_R3_P = NC_R3_P * 0.9946781,
+         NC_R3_5 = NC_R3_5 * 1.001355,
+         NC_R3_6 =NC_R3_6 * 0.9970812)
+
+Normalised_NC_totalandlog2andUBTFandziji  <- Normalised_NC_totalandlog2 %>%
+ mutate(NC_R1_P = NC_R1_P * 1.017866,
+         NC_R1_5 = NC_R1_5 * 1.019089,
+         NC_R1_6 =NC_R1_6 *1.017067,
+         NC_R2_P = NC_R2_P * 0.9700939,
+         NC_R2_5 = NC_R2_5 * 0.9936595,
+         NC_R2_6 =NC_R2_6 * 0.9786707,
+         NC_R3_P = NC_R3_P * 1.00064,
+         NC_R3_5 = NC_R3_5 * 1.00219,
+         NC_R3_6 =NC_R3_6 * 1.003124)
+
+
+
+Normalised_NC_log2andtotalandUBTF <- Normalised_NC_log2andtotal %>%
+ mutate(NC_R1_P = NC_R1_P * 0.9997758,
+         NC_R1_5 = NC_R1_5 * 1.004139,
+         NC_R1_6 =NC_R1_6 *1.008089,
+         NC_R2_P = NC_R2_P * 0.9971099,
+         NC_R2_5 = NC_R2_5 * 1.002148,
+         NC_R2_6 =NC_R2_6 * 0.9957758,
+         NC_R3_P = NC_R3_P * 0.9946781,
+         NC_R3_5 = NC_R3_5 * 1.001355,
+         NC_R3_6 =NC_R3_6 * 0.9970812)
+
+Normalised_NC_log2andtotalandUBTFandziji <- Normalised_NC_log2andtotal %>%
+ mutate(NC_R1_P = NC_R1_P * 1.011767,
+         NC_R1_5 = NC_R1_5 * 1.014061,
+         NC_R1_6 =NC_R1_6 *1.01411,
+         NC_R2_P = NC_R2_P * 0.978594,
+         NC_R2_5 = NC_R2_5 * 0.9965472,
+         NC_R2_6 =NC_R2_6 * 0.9841922,
+         NC_R3_P = NC_R3_P * 0.9987635,
+         NC_R3_5 = NC_R3_5 * 1.002022,
+         NC_R3_6 =NC_R3_6 * 1.001213)
+
+
+
+Normalised_NC_log2
+Normalised_NC_log2andtotal
+Normalised_NC_totalandlog2
+Normalised_NC_log2andFBL
+Normalised_NC_log2andtotalandFBL
+Normalised_NC_totalandlog2andFBL
+Normalised_NC_log2andUBTF
+Normalised_NC_totalandlog2andUBTF
+Normalised_NC_log2andtotalandUBTF
+Normalised_NC_log2andH3
+```
+
+```{r}
+library(tidyr)
+
+Normalised_NC_log2<- filtered_data2_NC %>%
+ mutate(No.1 = log2(NC_R1_P) ,
+         No.2 = log2(NC_R1_5),
+         No.3 =log2(NC_R1_6 ),
+         No.4 = log2(NC_R2_P) ,
+         No.5 = log2(NC_R2_5 ),
+         No.6 =log2(NC_R2_6 ),
+         No.7 = log2(NC_R3_P ),
+         No.8 = log2(NC_R3_5 ),
+         No.9 =log2(NC_R3_6 ))
+
+
+
+Normalised_NC_totalandlog2 <- filtered_data2_NC %>%
+ mutate(No.1 = log2(NC_R1_P * 0.753537),
+         No.2 = log2(NC_R1_5 * 0.7966058),
+         No.3 =log2(NC_R1_6 *0.8829002),
+         No.4 = log2(NC_R2_P * 1.68403),
+         No.5 = log2(NC_R2_5 * 1.196802),
+         No.6 =log2(NC_R2_6 * 1.403067),
+         No.7 = log2(NC_R3_P * 0.9273066),
+         No.8 = log2(NC_R3_5 * 1.015196),
+         No.9 =log2(NC_R3_6 * 0.9264013))
+
+
+
+
+
+melted_data_Normalised_NC_log2 <- pivot_longer(Normalised_NC_totalandlog2, cols = starts_with("No."), 
+                            names_to = "NC", values_to = "Log2change")
+
+
+
+
+
+boxandvioforNormalised_NC_log2 <- ggplot(melted_data_Normalised_NC_log2, 
+                                         aes(x = NC, y = Log2change, fill = NC)) +
+  labs(x = "Nucleolus Samples", y = "Log2 Abundance ", fill = "Nucleolus Samples") +
+  ggtitle("Nucleolus protein abundance after total abundance normalisation") +
+  geom_half_violin(position = position_nudge(x = 0.1, y = 0), side = 'R',
+                   adjust = 0.7, trim = FALSE, color = "grey", alpha = 0.5) +
+  geom_point(position = position_jitter(width = 0.03), 
+             size = 0.05, shape = 20, na.rm = FALSE, color = "grey70" ) +
+  geom_boxplot(outlier.shape = NA, width = 0.12, alpha = 0.8, lwd = 0.8) +
+  scale_fill_brewer(palette = "PuBu", 
+                    labels = c("No.1 Nucleolus replication1 pCLIP", 
+                               "No.2 Nucleolus replication1 TRINSIC Clone5", 
+                               "No.3 Nucleolus replication1 TRINSIC Clone6", 
+                               "No.4 Nucleolus replication2 pCLIP", 
+                               "No.5 Nucleolus replication2 TRINSIC Clone5", 
+                               "No.6 Nucleolus replication2 TRINSIC Clone6", 
+                               "No.7 Nucleolus replication3 pCLIP", 
+                               "No.8 Nucleolus replication3 TRINSIC Clone5", 
+                               "No.9 Nucleolus replication3 TRINSIC Clone6"))  +
+
+  theme_classic() +
+  theme(
+    text = element_text(family = "sans", colour = "black", size = 12),
+    axis.line = element_line(colour = "black", size = 0.6),
+    axis.ticks = element_line(colour = "black", size = 0.6),
+    axis.ticks.length = unit(1.5, units = "mm"),
+    plot.margin = unit(rep(1, 4), units = "lines"),
+
+    legend.text = element_text(size = 8) )
+                   
+                                         
+                                         
+print(boxandvioforNormalised_NC_log2)
+
+ggsave( "boxplot for NC after total.tiff", plot = boxandvioforNormalised_NC_log2, width = 15 , height =6.5, dpi = 700)
+
+
+```
+
+ggsave( "boxplot for NC after total.tiff", plot = boxandvioforNormalised_NC_log2, width = 15 , height =6.5, dpi = 2400)
+
+```{r}
+
+Nucleolus_Replication1_pCLIP <- (Normalised_NC_log2andH3$NC_R1_P)
+Nucleolus_Replication2_pCLIP <- (Normalised_NC_log2andH3$NC_R2_P)
+Nucleolus_Replication3_pCLIP <- (Normalised_NC_log2andH3$NC_R3_P)
+Nucleolus_Replication1_grDNA_Clone5 <- (Normalised_NC_log2andH3$NC_R1_5)
+Nucleolus_Replication2_grDNA_Clone5 <- (Normalised_NC_log2andH3$NC_R2_5)
+Nucleolus_Replication3_grDNA_Clone5 <- (Normalised_NC_log2andH3$NC_R3_5)
+Nucleolus_Replication1_grDNA_Clone6 <- (Normalised_NC_log2andH3$NC_R1_6)
+Nucleolus_Replication2_grDNA_Clone6 <- (Normalised_NC_log2andH3$NC_R2_6)
+Nucleolus_Replication3_grDNA_Clone6 <- (Normalised_NC_log2andH3$NC_R3_6)
+
+ tablesummaryforNC_H3 <- data.frame(
+ Gene = Normalised_NC_log2andH3$Gene,Nucleolus_Replication1_pCLIP = Nucleolus_Replication1_pCLIP,
+Nucleolus_Replication2_pCLIP = Nucleolus_Replication2_pCLIP,
+Nucleolus_Replication3_pCLIP = Nucleolus_Replication3_pCLIP,
+Nucleolus_Replication1_grDNA_Clone5 = Nucleolus_Replication1_grDNA_Clone5,
+Nucleolus_Replication2_grDNA_Clone5 = Nucleolus_Replication2_grDNA_Clone5,
+Nucleolus_Replication3_grDNA_Clone5 = Nucleolus_Replication3_grDNA_Clone5,
+Nucleolus_Replication1_grDNA_Clone6 = Nucleolus_Replication1_grDNA_Clone6,
+Nucleolus_Replication2_grDNA_Clone6 = Nucleolus_Replication2_grDNA_Clone6,
+Nucleolus_Replication3_grDNA_Clone6 = Nucleolus_Replication3_grDNA_Clone6)
+
+h31 <- c("H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8")
+H3 <- subset(tablesummaryforNC_H3, Gene %in% h31 )
+melted_data_H3<- pivot_longer(H3, cols = starts_with("Nucleolus"), 
+                            names_to = "Foldchange", values_to = "Log2change")
+
+
+
+melted_data_H3$Foldchange <- factor(melted_data_H3$Foldchange,
+                                      levels = c("Nucleolus_Replication1_pCLIP",
+                                                 "Nucleolus_Replication1_grDNA_Clone5",
+                                                 "Nucleolus_Replication1_grDNA_Clone6",
+                                                 "Nucleolus_Replication2_pCLIP",
+                                                 "Nucleolus_Replication2_grDNA_Clone5",
+                                                 "Nucleolus_Replication2_grDNA_Clone6",
+                                                 "Nucleolus_Replication3_pCLIP",
+                                                 "Nucleolus_Replication3_grDNA_Clone5",
+                                                 "Nucleolus_Replication3_grDNA_Clone6"))
+
+color_palette <- brewer.pal(n = 9, name = "BrBG")
+
+
+H3_bar_graph <- ggplot(melted_data_H3, aes(x = Foldchange, y = Log2change, fill = Foldchange)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.7, width = 0.5, color ='black') +
+  labs(x = "", y = "Log2 Abundance ", fill = "Nucleolus Samples") +
+  ggtitle("Nucleolus Histone 3 after total normalisation") +
+  scale_y_continuous(limits = c(0, 40), breaks = seq(0, 40, by = 5)) +  
+  scale_fill_manual(values = c("Nucleolus_Replication1_pCLIP" = color_palette[1],       "Nucleolus_Replication1_grDNA_Clone5" = color_palette[2], 
+ "Nucleolus_Replication1_grDNA_Clone6" = color_palette[3], 
+ "Nucleolus_Replication2_pCLIP" = color_palette[4], 
+"Nucleolus_Replication2_grDNA_Clone5" = color_palette[5],
+"Nucleolus_Replication2_grDNA_Clone6" = color_palette[6],
+"Nucleolus_Replication3_pCLIP" = color_palette[7], 
+"Nucleolus_Replication3_grDNA_Clone5" = color_palette[8],
+"Nucleolus_Replication3_grDNA_Clone6" = color_palette[9]), 
+
+                    labels = c("Nucleolus replication1 pCLIP", "Nucleolus replication1 grDNA#5", "Nucleolus replication1 grDNA#6", "Nucleolus replication2 pCLIP", "Nucleolus replication2 grDNA#5", "Nucleolus replication2 grDNA#6", "Nucleolus replication3 pCLIP", "Nucleolus replication3 grDNA#5", "Nucleolus replication3 grDNA#6")) + 
+  geom_vline(xintercept = seq(0.5, length(unique(melted_data_H3$Gene)) - 0.5, by = 1), color = "black", size = 1) + 
+  geom_hline(yintercept = c(0,-1, -2), linetype = "solid", color = "black", size = 1) +  
+  geom_text(aes(label = sprintf("%.1f", Log2change)), position = position_dodge(width = 0.9), vjust = -1.5, size = 3)  + 
+  my_theme
+
+# Print the plot
+print(H3_bar_graph)
+
+ggsave( "Bar graph for nucleolus H3 after normlisation .tiff", plot = H3_bar_graph, width = 12 , height =6, dpi = 500)
+```
+
+```{r}
+Nucleoplasm_Replication1_pCLIP <- (Normalised_NP_totalandlog2$NP_R1_P)
+Nucleoplasm_Replication2_pCLIP <- (Normalised_NP_totalandlog2$NP_R2_P)
+Nucleoplasm_Replication3_pCLIP <- (Normalised_NP_totalandlog2$NP_R3_P)
+Nucleoplasm_Replication1_grDNA_Clone5 <- (Normalised_NP_totalandlog2$NP_R1_5)
+Nucleoplasm_Replication2_grDNA_Clone5 <- (Normalised_NP_totalandlog2$NP_R2_5)
+Nucleoplasm_Replication3_grDNA_Clone5 <- (Normalised_NP_totalandlog2$NP_R3_5)
+Nucleoplasm_Replication1_grDNA_Clone6 <- (Normalised_NP_totalandlog2$NP_R1_6)
+Nucleoplasm_Replication2_grDNA_Clone6 <- (Normalised_NP_totalandlog2$NP_R2_6)
+Nucleoplasm_Replication3_grDNA_Clone6 <- (Normalised_NP_totalandlog2$NP_R3_6)
+
+
+ tablesummaryforNP_H3 <- data.frame(
+ Gene = Normalised_NP_totalandlog2$Gene,Nucleoplasm_Replication1_pCLIP = Nucleoplasm_Replication1_pCLIP,
+Nucleoplasm_Replication2_pCLIP = Nucleoplasm_Replication2_pCLIP,
+Nucleoplasm_Replication3_pCLIP = Nucleoplasm_Replication3_pCLIP,
+Nucleoplasm_Replication1_grDNA_Clone5 = Nucleoplasm_Replication1_grDNA_Clone5,
+Nucleoplasm_Replication2_grDNA_Clone5 = Nucleoplasm_Replication2_grDNA_Clone5,
+Nucleoplasm_Replication3_grDNA_Clone5 = Nucleoplasm_Replication3_grDNA_Clone5,
+Nucleoplasm_Replication1_grDNA_Clone6 = Nucleoplasm_Replication1_grDNA_Clone6,
+Nucleoplasm_Replication2_grDNA_Clone6 = Nucleoplasm_Replication2_grDNA_Clone6,
+Nucleoplasm_Replication3_grDNA_Clone6 = Nucleoplasm_Replication3_grDNA_Clone6)
+ 
+ h31 <- c("H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8")
+H3 <- subset(tablesummaryforNP_H3, Gene %in% h31 )
+
+melted_data_H3<- pivot_longer(H3, cols = starts_with("Nucleoplasm"), 
+                            names_to = "Foldchange", values_to = "Log2change")
+
+melted_data_H3$Foldchange <- factor(melted_data_H3$Foldchange,
+                                      levels = c("Nucleoplasm_Replication1_pCLIP",
+                                                 "Nucleoplasm_Replication1_grDNA_Clone5",
+                                                 "Nucleoplasm_Replication1_grDNA_Clone6",
+                                                 "Nucleoplasm_Replication2_pCLIP",
+                                                 "Nucleoplasm_Replication2_grDNA_Clone5",
+                                                 "Nucleoplasm_Replication2_grDNA_Clone6",
+                                                 "Nucleoplasm_Replication3_pCLIP",
+                                                 "Nucleoplasm_Replication3_grDNA_Clone5",
+                                                 "Nucleoplasm_Replication3_grDNA_Clone6"))
+
+color_palette <- brewer.pal(n = 9, name = "BrBG")
+
+
+H3_bar_graph <- ggplot(melted_data_H3, aes(x = Foldchange, y = Log2change, fill = Foldchange)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), alpha = 0.7, width = 0.5, color ='black') +
+  labs(x = "", y = "Log2 Abundance ", fill = "Nucleoplasm Samples") +
+  ggtitle("Nucleoplasm Histone 3 after total normalisation") +
+  scale_y_continuous(limits = c(0, 40), breaks = seq(0, 40, by = 5)) +  
+  scale_fill_manual(values = c("Nucleoplasm_Replication1_pCLIP" = color_palette[1],       "Nucleoplasm_Replication1_grDNA_Clone5" = color_palette[2], 
+ "Nucleoplasm_Replication1_grDNA_Clone6" = color_palette[3], 
+ "Nucleoplasm_Replication2_pCLIP" = color_palette[4], 
+"Nucleoplasm_Replication2_grDNA_Clone5" = color_palette[5],
+"Nucleoplasm_Replication2_grDNA_Clone6" = color_palette[6],
+"Nucleoplasm_Replication3_pCLIP" = color_palette[7], 
+"Nucleoplasm_Replication3_grDNA_Clone5" = color_palette[8],
+"Nucleoplasm_Replication3_grDNA_Clone6" = color_palette[9]), 
+
+                    labels = c("Nucleoplasm replication1 pCLIP", "Nucleoplasm replication1 grDNA#5", "Nucleoplasm replication1 grDNA#6", "Nucleoplasm replication2 pCLIP", "Nucleoplasm replication2 grDNA#5", "Nucleoplasm replication2 grDNA#6", "Nucleoplasm replication3 pCLIP", "Nucleoplasm replication3 grDNA#5", "Nucleoplasm replication3 grDNA#6")) + 
+  geom_vline(xintercept = seq(0.5, length(unique(melted_data_H3$Gene)) - 0.5, by = 1), color = "black", size = 1) + 
+  geom_hline(yintercept = c(0,-1, -2), linetype = "solid", color = "black", size = 1) +  
+  geom_text(aes(label = sprintf("%.1f", Log2change)), position = position_dodge(width = 0.9), vjust = -1.5, size = 3)  + 
+  my_theme
+
+# Print the plot
+print(H3_bar_graph)
+ggsave( "Bar graph for nucleoplasm H3 after normlisation .tiff", plot = H3_bar_graph, width = 12 , height =6, dpi = 500)
+```
+
+```{r}
+UBTFandFBL1 <- c( "FBL", "UBTF")
+UBTFandFBL <- subset(Normalised_NC_totalandlog2, Gene %in% UBTFandFBL1 )
+rownames(UBTFandFBL) <- UBTFandFBL$Gene
+
+reversed_UBTFandFBL <- as.data.frame(t(UBTFandFBL))
+
+reversed_UBTFandFBL <- reversed_UBTFandFBL[-1, ]
+
+reversed_UBTFandFBL %>%
+ggplot(aes(FBL,UBTF)) +
+geom_point(pch=10,col="dodgerblue",alpha = 1) +
+labs(x = "FBL",
+y = "UBTF")
+
+
+reversed_UBTFandFBL$FBL <- as.numeric(reversed_UBTFandFBL$FBL)
+reversed_UBTFandFBL$UBTF <- as.numeric(reversed_UBTFandFBL$UBTF)
+
+model <- lm(reversed_UBTFandFBL$UBTF ~ reversed_UBTFandFBL$FBL, reversed_UBTFandFBL = reversed_UBTFandFBL)
+
+
+# Extract coefficients
+coefficients <- coef(model)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+
+# Display the coefficients
+print("Coefficients:")
+print(coefficients)
+
+# Display the y-intercept
+print("Y-intercept (intersect with y-axis):")
+print(intercept)
+
+
+UBTFvsFBL <- ggplot(reversed_UBTFandFBL, aes(x = FBL, y = UBTF)) +
+  geom_point(pch = 16, col = "dodgerblue", size = 2, alpha = 1) +
+  geom_abline(intercept = intercept, slope = 1, color = "green") +  # Line with slope = 1
+  geom_abline(intercept = intercept, slope = slope, color = "red") +  # Regression line
+  labs(x = "FBL", y = "UBTF")
+# Display the plot
+print(UBTFvsFBL)
+
+
+
+
+```
+
+
+```{r}
+Normalised_NC_log2andFBL_df_long <- Normalised_NC_totalandlog2 %>%
+  pivot_longer(cols = starts_with("NC"), names_to = "Variable", values_to = "Value")
+
+# Create a column to identify the biological replicate
+Normalised_NC_log2andFBL_df_long <- Normalised_NC_log2andFBL_df_long %>%
+  mutate(Replicate = case_when(
+    Variable %in% c("NC_R1_P", "NC_R1_5", "NC_R1_6") ~ "Replicate1",
+    Variable %in% c("NC_R2_P", "NC_R2_5", "NC_R2_6") ~ "Replicate2",
+    Variable %in% c("NC_R3_P", "NC_R3_5", "NC_R3_6") ~ "Replicate3"
+  ))
+
+# Create a column to identify the treatment
+Normalised_NC_log2andFBL_df_long <- Normalised_NC_log2andFBL_df_long %>%
+  mutate(Treatment = case_when(
+    Variable %in% c("NC_R1_P", "NC_R2_P", "NC_R3_P") ~ "Pclip",
+    Variable %in% c("NC_R1_5", "NC_R2_5", "NC_R3_5") ~ "Clone5",
+    Variable %in% c("NC_R1_6", "NC_R2_6", "NC_R3_6") ~ "Clone6"
+  ))
+
+
+
+
+# Filter for the control and drug treatment 1
+df_Clone5 <- Normalised_NC_log2andFBL_df_long %>%
+  filter(Treatment %in% c("Pclip", "Clone5"))
+
+
+df_Clone5 <- df_Clone5 %>%
+  mutate_all(~ ifelse(is.infinite(.), NA, .))
+
+df_Clone5 <- df_Clone5 %>%
+  group_by(Gene, Treatment) %>%
+  filter(sum(is.na(Value)) < 2) %>%
+  ungroup() %>%
+  group_by(Gene) %>%
+  filter(n_distinct(Treatment) == 2)
+
+
+# Calculate the mean difference and p-values for each category
+resultsforNCclone5 <- df_Clone5 %>%
+  group_by(Gene) %>%
+  summarise(
+    mean_Pclip = mean(Value[Treatment == "Pclip"], na.rm = TRUE),
+    mean_Clone5 = mean(Value[Treatment == "Clone5"], na.rm = TRUE),
+    mean_difference = mean_Clone5 - mean_Pclip,
+    p_value = {
+      Pclip_values <- Value[Treatment == "Pclip"]
+      Clone5_values <- Value[Treatment == "Clone5"]
+      # Remove NA values before performing t-test
+      t.test(Pclip_values, Clone5_values, na.rm = TRUE)$p.value
+    }
+  )
+
+# Print the results
+print(resultsforNCclone5)
+
+filtered_Pvalue_resultsforNCclone5 <- resultsforNCclone5 %>%
+  filter(p_value < 0.05)
+
+filtered_Pvalue_resultsforNCclone5dayu0 <- resultsforNCclone5 %>%
+  filter(mean_difference > 0)
+
+
+
+filtered_Pvalue_resultsforNCclone5_biggerthan0.58 <- filtered_Pvalue_resultsforNCclone5 %>%
+  filter(mean_difference > 0.50)
+
+view(filtered_Pvalue_resultsforNCclone5_biggerthan0.58)
+
+filtered_Pvalue_resultsforNCclone5_smallerthanfu0.58 <- filtered_Pvalue_resultsforNCclone5 %>%
+  filter(mean_difference < -0.5)
+
+view(filtered_Pvalue_resultsforNCclone5_smallerthanfu0.58)
+
+# Filter for the control and drug treatment 1
+df_Clone6 <- Normalised_NC_log2andFBL_df_long %>%
+  filter(Treatment %in% c("Pclip", "Clone6"))
+
+
+df_Clone6 <- df_Clone6 %>%
+  mutate_all(~ ifelse(is.infinite(.), NA, .))
+
+df_Clone6 <- df_Clone6 %>%
+  group_by(Gene, Treatment) %>%
+  filter(sum(is.na(Value)) < 2) %>%
+  ungroup() %>%
+  group_by(Gene) %>%
+  filter(n_distinct(Treatment) == 2)
+
+
+# Calculate the mean difference and p-values for each category
+resultsforNCclone6 <- df_Clone6 %>%
+  group_by(Gene) %>%
+  summarise(
+    mean_Pclip = mean(Value[Treatment == "Pclip"], na.rm = TRUE),
+    mean_Clone6 = mean(Value[Treatment == "Clone6"], na.rm = TRUE),
+    mean_difference = mean_Clone6 - mean_Pclip,
+    p_value = {
+      Pclip_values <- Value[Treatment == "Pclip"]
+      Clone6_values <- Value[Treatment == "Clone6"]
+      # Remove NA values before performing t-test
+      t.test(Pclip_values, Clone6_values, na.rm = TRUE)$p.value
+    }
+  )
+
+# Print the results
+print(resultsforNCclone6)
+
+filtered_Pvalue_resultsforNCclone6 <- resultsforNCclone6 %>%
+  filter(p_value < 0.05)
+
+
+filtered_Pvalue_resultsforNCclone6_biggerthan0.58 <- filtered_Pvalue_resultsforNCclone6 %>%
+  filter(mean_difference > 0.50)
+
+view(filtered_Pvalue_resultsforNCclone6_biggerthan0.58)
+
+filtered_Pvalue_resultsforNCclone6_smallerthanfu0.58  <- filtered_Pvalue_resultsforNCclone6 %>%
+  filter(mean_difference < -0.5)
+
+view(filtered_Pvalue_resultsforNCclone6_smallerthanfu0.58)
+
+
+`
+```
+
+
+```{r}
+resultsforNCclone5<- resultsforNCclone5 %>%
+  mutate(expression = NA)
+
+
+resultsforNCclone5$expression = ifelse(resultsforNCclone5$p_value < 0.05 & abs(resultsforNCclone5$mean_difference) >= 0.5, 
+                     ifelse(resultsforNCclone5$mean_difference> 0.5,'Up','Down'),
+                     'Stable')
+
+
+label_data =filter(resultsforNCclone5,((resultsforNCclone5$p_value < 0.05 ) &( abs(resultsforNCclone5$mean_difference)>= 1)))[1:25,]
+
+NCclone5test <- ggplot(data = resultsforNCclone5, 
+            aes(x = mean_difference, 
+                y = -log10(p_value), 
+                colour=expression,
+                label = Gene)) +
+  geom_point(alpha=0.9, size=2.2) +
+  scale_color_manual(values=c("blue", "grey","red"))+
+  xlim(c(-4.5, 4.5)) +
+  geom_vline(xintercept=c(-0.5,0.5),lty=4,col="black",lwd=0.8) +
+  geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
+  labs(x="log2(fold change)",
+       y="-log10 (adj.p-value)",
+       title="Nucleolus grDNA#5 Differential expression")  +
+  theme_bw()+
+  geom_label_repel(data = label_data,
+                   box.padding = 0.3,
+                   point.padding =0.1,
+                   min.segment.length = 0.05,
+                   segment.size =0.2,
+                   firce =1.2,
+                   max.overlap = 5000,
+                   size =2,
+                   show.legend = FALSE ) + 
+                
+  scale_x_continuous(limits = c(-3,3), breaks = seq(-3, 3, by = 1))+
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position="right", 
+        legend.title = element_blank(),
+        panel.grid = element_blank(),
+        axis.title.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.title.y =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.y =  element_text(face = "bold", colour = "black",size =10))
+
+
+
+print(NCclone5test)
+
+
+
+
+resultsforNCclone6<- resultsforNCclone6 %>%
+  mutate(expression = NA)
+
+
+resultsforNCclone6$expression = ifelse(resultsforNCclone6$p_value < 0.05 & abs(resultsforNCclone6$mean_difference) >= 0.5, 
+                     ifelse(resultsforNCclone6$mean_difference> 0.5,'Up','Down'),
+                     'Stable')
+
+label_data =filter(resultsforNCclone6,((resultsforNCclone6$p_value < 0.05 ) &( abs(resultsforNCclone6$mean_difference)>= 1)))[1:20,]
+
+NCclone6test <- ggplot(data = resultsforNCclone6, 
+            aes(x = mean_difference, 
+                y = -log10(p_value), 
+                colour=expression,
+                label = Gene)) +
+  geom_point(alpha=0.9, size=2.2) +
+  scale_color_manual(values=c("blue", "grey","red"))+
+  xlim(c(-4.5, 4.5)) +
+  geom_vline(xintercept=c(-0.5,0.5),lty=4,col="black",lwd=0.8) +
+  geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
+  labs(x="log2(fold change)",
+       y="-log10 (adj.p-value)",
+       title="Nucleolus grDNA#6 Differential expression")  +
+  theme_bw()+
+  geom_label_repel(data = label_data,
+                   box.padding = 0.3,
+                   point.padding =0.1,
+                   min.segment.length = 0.05,
+                   segment.size =0.2,
+                   firce =1.2,
+                   max.overlap = 5000,
+                   size =2,
+                   show.legend = FALSE )  + 
+                
+  scale_x_continuous(limits = c(-3,3), breaks = seq(-3, 3, by = 1))+
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position="right", 
+        legend.title = element_blank(),
+        panel.grid = element_blank(),
+        axis.title.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.title.y =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.y =  element_text(face = "bold", colour = "black",size =10))
+
+
+print(NCclone6test)
+
+ggsave( "Volcano plot for nucleolus C5 log2 .tiff", plot = NCclone5test, width = 9 , height =6, dpi = 600)
+
+ggsave( "Volcano plot for nucleolus C6 log2 .tiff", plot = NCclone6test, width = 9 , height =6, dpi = 600)
+
+
+```
+ggsave( "Volcano plot for nucleolus C5 log2 .tiff", plot = NCclone5test, width = 9 , height =6, dpi = 1500)
+
+ggsave( "Volcano plot for nucleolus C6 log2 .tiff", plot = NCclone6test, width = 9 , height =6, dpi = 1500)
+
+
+
+```{r}
+Normalised_NP_log2<- filtered_data2_NP %>%
+ mutate(NP_R1_P = log2(NP_R1_P ),
+         NP_R1_5 = log2(NP_R1_5 ),
+         NP_R1_6 =log2(NP_R1_6 ),
+         NP_R2_P = log2(NP_R2_P ),
+         NP_R2_5 = log2(NP_R2_5 ),
+         NP_R2_6 =log2(NP_R2_6 ),
+         NP_R3_P = log2(NP_R3_P ),
+         NP_R3_5 = log2(NP_R3_5 ),
+         NP_R3_6 =log2(NP_R3_6))
+
+Normalised_NP_totalandlog2 <- filtered_data2_NP %>%
+  mutate(NP_R1_P = log2(NP_R1_P *0.6654107),
+         NP_R1_5 = log2(NP_R1_5 *3.776271),
+         NP_R1_6 =log2(NP_R1_6 * 1.005769),
+         NP_R2_P = log2(NP_R2_P *0.5688305),
+         NP_R2_5 = log2(NP_R2_5 *1.637426),
+         NP_R2_6 =1.001*log2(NP_R2_6 * 0.5885434),
+         NP_R3_P = log2(NP_R3_P *1.13437),
+         NP_R3_5 = log2(NP_R3_5 *2.114122),
+         NP_R3_6 =log2(NP_R3_6 * 1.225912))
+
+Normalised_NP_log2andtotal <- filtered_data2_NP %>%
+  mutate(NP_R1_P = log2(NP_R1_P )*0.9784411,
+         NP_R1_5 = log2(NP_R1_5 )*1.048068,
+         NP_R1_6 =log2(NP_R1_6 )* 0.9941566,
+         NP_R2_P = log2(NP_R2_P) *0.9726045,
+         NP_R2_5 = log2(NP_R2_5 )*1.013359 ,
+         NP_R2_6 =log2(NP_R2_6 ) * 0.9738665,
+         NP_R3_P = log2(NP_R3_P) *0.9988294,
+         NP_R3_5 = log2(NP_R3_5 )*1.023726,
+         NP_R3_6 =log2(NP_R3_6 )* 1.001867)
+
+Normalised_NP_totalandlog2andH3ziji <- Normalised_NP_totalandlog2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9944505,
+         NP_R1_5 = NP_R1_5 * 0.9954102,
+         NP_R1_6 =NP_R1_6 *1.001614,
+         NP_R2_P = NP_R2_P * 1.003419,
+         NP_R2_5 = NP_R2_5 * 0.9941515,
+         NP_R2_6 =NP_R2_6 * 1.005629,
+         NP_R3_P = NP_R3_P * 0.9989387,
+         NP_R3_5 = NP_R3_5 * 1.004081,
+         NP_R3_6 =NP_R3_6 * 1.002462)
+
+Normalised_Np_log2andtotalandH3ziji <- Normalised_NP_log2andtotal %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9909005,
+         NP_R1_5 = NP_R1_5 * 1.003177,
+         NP_R1_6 =NP_R1_6 *1.000575,
+         NP_R2_P = NP_R2_P * 0.9986738,
+         NP_R2_5 = NP_R2_5 * 0.9962033,
+         NP_R2_6 =NP_R2_6 * 1.001038,
+         NP_R3_P = NP_R3_P * 0.9986806,
+         NP_R3_5 = NP_R3_5 * 1.008195,
+         NP_R3_6 =NP_R3_6 * 1.002744)
+
+
+Normalised_NP_log2andH3 <- Normalised_NP_log2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9695915,
+         NP_R1_5 = NP_R1_5 * 1.051456,
+         NP_R1_6 =NP_R1_6 *0.9947835,
+         NP_R2_P = NP_R2_P * 0.9713684,
+         NP_R2_5 = NP_R2_5 * 1.009567,
+         NP_R2_6 =NP_R2_6 * 0.9749314,
+         NP_R3_P = NP_R3_P * 0.9975668,
+         NP_R3_5 = NP_R3_5 * 1.032172,
+         NP_R3_6 =NP_R3_6 * 1.004672)
+
+Normalised_NP_totalandlog2andH3 <- Normalised_NP_totalandlog2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9695915,
+         NP_R1_5 = NP_R1_5 * 1.051456,
+         NP_R1_6 =NP_R1_6 *0.9947835,
+         NP_R2_P = NP_R2_P * 0.9713684,
+         NP_R2_5 = NP_R2_5 * 1.009567,
+         NP_R2_6 =NP_R2_6 * 0.9749314,
+         NP_R3_P = NP_R3_P * 0.9975668,
+         NP_R3_5 = NP_R3_5 * 1.032172,
+         NP_R3_6 =NP_R3_6 * 1.004672)
+
+Normalised_Np_log2andtotalandH3 <- Normalised_NP_log2andtotal %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9695915,
+         NP_R1_5 = NP_R1_5 * 1.051456,
+         NP_R1_6 =NP_R1_6 *0.9947835,
+         NP_R2_P = NP_R2_P * 0.9713684,
+         NP_R2_5 = NP_R2_5 * 1.009567,
+         NP_R2_6 =NP_R2_6 * 0.9749314,
+         NP_R3_P = NP_R3_P * 0.9975668,
+         NP_R3_5 = NP_R3_5 * 1.032172,
+         NP_R3_6 =NP_R3_6 * 1.004672)
+
+
+Normalised_NP_log2andNONO <- Normalised_NP_log2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9760201,
+         NP_R1_5 = NP_R1_5 * 1.05844,
+         NP_R1_6 =NP_R1_6 *1.000594,
+         NP_R2_P = NP_R2_P * 0.9662814,
+         NP_R2_5 = NP_R2_5 * 1.007568,
+         NP_R2_6 =NP_R2_6 * 0.9702695,
+         NP_R3_P = NP_R3_P * 0.9964965,
+         NP_R3_5 = NP_R3_5 * 1.029158,
+         NP_R3_6 =NP_R3_6 * 1.001975)
+
+Normalised_NP_totalandlog2andNONO <- Normalised_NP_totalandlog2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9760201,
+         NP_R1_5 = NP_R1_5 * 1.05844,
+         NP_R1_6 =NP_R1_6 *1.000594,
+         NP_R2_P = NP_R2_P * 0.9662814,
+         NP_R2_5 = NP_R2_5 * 1.007568,
+         NP_R2_6 =NP_R2_6 * 0.97702695,
+         NP_R3_P = NP_R3_P * 0.9964965,
+         NP_R3_5 = NP_R3_5 * 1.029158,
+         NP_R3_6 =NP_R3_6 * 1.001975)
+
+Normalised_Np_log2andtotalandNONO <- Normalised_NP_log2andtotal %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9760201,
+         NP_R1_5 = NP_R1_5 * 1.05844,
+         NP_R1_6 =NP_R1_6 *1.000594,
+         NP_R2_P = NP_R2_P * 0.9662814,
+         NP_R2_5 = NP_R2_5 * 1.007568,
+         NP_R2_6 =NP_R2_6 * 0.9702695,
+         NP_R3_P = NP_R3_P * 0.9964965,
+         NP_R3_5 = NP_R3_5 * 1.029158,
+         NP_R3_6 =NP_R3_6 * 1.001975)
+
+
+Normalised_NP_totalandlog2andNONOziji <- Normalised_NP_totalandlog2 %>%
+ mutate(NP_R1_P = NP_R1_P * 1.003442,
+         NP_R1_5 = NP_R1_5 * 0.9969113,
+         NP_R1_6 =NP_R1_6 *1.008072,
+         NP_R2_P = NP_R2_P * 1.000926,
+         NP_R2_5 = NP_R2_5 * 0.990898,
+         NP_R2_6 =NP_R2_6 * 1.003476,
+         NP_R3_P = NP_R3_P * 0.9979944,
+         NP_R3_5 = NP_R3_5 * 0.9988633,
+         NP_R3_6 =NP_R3_6 * 0.9996046)
+
+
+
+Normalised_Np_log2andtotalandNONOziji <- Normalised_NP_log2andtotal %>%
+ mutate(NP_R1_P = NP_R1_P * 0.9974371,
+         NP_R1_5 = NP_R1_5 * 1.009807,
+         NP_R1_6 =NP_R1_6 *1.006385,
+         NP_R2_P = NP_R2_P * 0.9934106,
+         NP_R2_5 = NP_R2_5 * 0.9941973,
+         NP_R2_6 =NP_R2_6 * 0.996218,
+         NP_R3_P = NP_R3_P * 0.9975757,
+         NP_R3_5 = NP_R3_5 * 1.005217,
+         NP_R3_6 =NP_R3_6 * 1.000019)
+
+
+
+
+
+
+
+
+
+
+Normalised_NP_log2
+Normalised_NP_totalandlog2
+Normalised_NP_log2andtotal
+Normalised_NP_totalandlog2andH3ziji
+Normalised_Np_log2andtotalandH3ziji
+Normalised_NP_log2andH3
+Normalised_NP_totalandlog2andH3
+Normalised_Np_log2andtotalandH3
+Normalised_NP_log2andNONO
+Normalised_NP_totalandlog2andNONO
+Normalised_Np_log2andtotalandNONO
+Normalised_NP_totalandlog2andNONOziji
+Normalised_Np_log2andtotalandNONOziji
+```
+
+```{r}
+	H4inNP <- c("H4C1; H4C11; H4C12; H4C13; H4C14; H4C15; H4C16; H4C2; H4C3; H4C4; H4C5; H4C6; H4C8; H4C9")
+H4inNPtable <- subset(Normalised_NP_log2, Gene %in% H4inNP )
+
+totalsampleNPH4 <- sum(H4inNPtable$NP_R1_P, na.rm = TRUE)+
+sum(H4inNPtable$NP_R2_P, na.rm = TRUE)+
+sum(H4inNPtable$NP_R3_P, na.rm = TRUE)+
+  sum(H4inNPtable$NP_R1_5, na.rm = TRUE)+
+ sum(H4inNPtable$NP_R2_5, na.rm = TRUE)+
+  sum(H4inNPtable$NP_R3_5, na.rm = TRUE)+
+   sum(H4inNPtable$NP_R1_6, na.rm = TRUE)+
+  sum(H4inNPtable$NP_R2_6, na.rm = TRUE)+
+   sum(H4inNPtable$NP_R3_6, na.rm = TRUE)
+
+average_NP_based_ontotal_H4 <- totalsampleNPH4/9
+print(average_NP_based_ontotal_H4)
+
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R1_P, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R1_5, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R1_6, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R2_P, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R2_5, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R2_6, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R3_P, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R3_5, na.rm = TRUE)
+average_NP_based_ontotal_H4/sum(H4inNPtable$NP_R3_6, na.rm = TRUE)
+
+
+Normalised_NP_log2andH4 <- Normalised_NP_log2 %>%
+ mutate(NP_R1_P = NP_R1_P * 0.973754,
+         NP_R1_5 = NP_R1_5 * 1.075807,
+         NP_R1_6 =NP_R1_6 *1.011058,
+         NP_R2_P = NP_R2_P * 0.9685318,
+         NP_R2_5 = NP_R2_5 * 1.019341,
+         NP_R2_6 =NP_R2_6 * 0.9737376,
+         NP_R3_P = NP_R3_P * 0.9989284,
+         NP_R3_5 = NP_R3_5 * 0.9796342,
+         NP_R3_6 =NP_R3_6 * 1.007963)
+ 
+
+```
+
+
+```{r}
+
+
+
+Normalised_NP_log2<- filtered_data2_NP %>%
+ mutate(No.1 = log2(NP_R1_P ),
+         No.2 = log2(NP_R1_5 ),
+         No.3 =log2(NP_R1_6 ),
+         No.4 = log2(NP_R2_P ),
+         No.5 = log2(NP_R2_5 ),
+         No.6 =log2(NP_R2_6 ),
+         No.7 = log2(NP_R3_P ),
+         No.8 = log2(NP_R3_5 ),
+         No.9 =log2(NP_R3_6))
+
+Normalised_NP_totalandlog2 <- filtered_data2_NP %>%
+  mutate(No.1 = log2(NP_R1_P *0.6654107),
+         No.2 = log2(NP_R1_5 *3.776271),
+         No.3 =log2(NP_R1_6 * 1.005769),
+         No.4 = log2(NP_R2_P *0.5688305),
+         No.5 = log2(NP_R2_5 *1.637426),
+         No.6 =log2(NP_R2_6 * 0.5885434),
+         No.7 = log2(NP_R3_P *1.13437),
+         No.8 = log2(NP_R3_5 *2.114122),
+         No.9 =log2(NP_R3_6 * 1.225912))
+
+
+
+
+melted_data_Normalised_NP_log2 <- pivot_longer(Normalised_NP_log2, cols = starts_with("No."), 
+                            names_to = "NP", values_to = "Log2change")
+
+
+
+boxandvioforNormalised_NP_log2 <- ggplot(melted_data_Normalised_NP_log2, 
+                                         aes(x = NP, y = Log2change, fill = NP)) +
+  labs(x = "Nucleoplasm  Samples", y = "Log2 Abundance ", fill = "Nucleoplasm Samples") +
+  ggtitle("Nucleoplasm protein abundance Before total abundance normalisation") +
+  geom_half_violin(position = position_nudge(x = 0.1, y = 0), side = 'R',
+                   adjust = 0.7, trim = FALSE, color = "grey", alpha = 0.5) +
+  geom_point(position = position_jitter(width = 0.03), 
+             size = 0.05, shape = 20, na.rm = FALSE, color = "grey70" ) +
+  geom_boxplot(outlier.shape = NA, width = 0.12, alpha = 0.8, lwd = 0.8) +
+  scale_fill_brewer(palette = "PuBu", 
+                    labels = c("No.1 Nucleoplasm replication1 pCLIP", 
+                               "No.2 Nucleoplasm replication1 grDNA#5", 
+                               "No.3 Nucleoplasm replication1 grDNA#6", 
+                               "No.4 Nucleoplasm replication2 pCLIP", 
+                               "No.5 Nucleoplasm replication2 grDNA#5", 
+                               "No.6 Nucleoplasm replication2 grDNA#6", 
+                               "No.7 Nucleoplasm replication3 pCLIP", 
+                               "No.8 Nucleoplasm replication3 grDNA#5", 
+                               "No.9 Nucleoplasm replication3 grDNA#6"))  +
+
+  theme_classic() +
+  theme(
+    text = element_text(family = "sans", colour = "black", size = 12),
+    axis.line = element_line(colour = "black", size = 0.6),
+    axis.ticks = element_line(colour = "black", size = 0.6),
+    axis.ticks.length = unit(1.5, units = "mm"),
+    plot.margin = unit(rep(1, 4), units = "lines"),
+
+    legend.text = element_text(size = 8) )
+                                         
+                                         
+print(boxandvioforNormalised_NP_log2)
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+NONOandH3 <- c( "NONO", "H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8")
+NONOandH3 <- subset(Normalised_NP_totalandlog2, Gene %in% NONOandH3 )
+rownames(NONOandH3) <- NONOandH3$Gene
+
+reversed_NONOandH3 <- as.data.frame(t(NONOandH3))
+
+reversed_NONOandH3 <- reversed_NONOandH3[-1, ]
+
+reversed_NONOandH3 %>%
+ggplot(aes(NONO, `H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8`)) +
+geom_point(pch=10,col="dodgerblue",alpha = 1) +
+labs(x = "NONO",
+y = "H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8")
+
+
+reversed_NONOandH3$NONO <- as.numeric(reversed_NONOandH3$NONO)
+reversed_NONOandH3$`H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8`<- as.numeric(reversed_NONOandH3$`H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8` )
+
+model <- lm(reversed_NONOandH3$NONO ~ reversed_NONOandH3$`H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8`, reversed_NONOandH3 = reversed_NONOandH3)
+
+
+# Extract coefficients
+coefficients1 <- coef(model)
+intercept1 <- coefficients1[1]
+slope1 <- coefficients1[2]
+
+# Display the coefficients
+print("Coefficients1:")
+print(coefficients1)
+
+# Display the y-intercept
+print("Y-intercept (intersect with y-axis):")
+print(intercept)
+
+
+H3vsNONO <- ggplot(reversed_NONOandH3, aes(x = NONO, y = `H3C1; H3C10; H3C11; H3C12; H3C2; H3C3; H3C4; H3C6; H3C7; H3C8`)) +
+  geom_point(pch = 16, col = "dodgerblue", size = 2, alpha = 1) +
+  geom_abline(intercept = intercept1, slope = 1, color = "green") +  # Line with slope = 1
+  geom_abline(intercept = intercept1 , slope = slope1 , color = "red") +  # Regression line
+  labs(x = "NONO", y = "H3")
+# Display the plot
+print(H3vsNONO)
+
+
+
+
+
+```
+Normalised_NP_log2
+Normalised_NP_totalandlog2
+Normalised_NP_log2andtotal
+Normalised_NP_totalandlog2andH3ziji
+Normalised_Np_log2andtotalandH3ziji
+Normalised_NP_log2andH3
+Normalised_NP_totalandlog2andH3
+Normalised_Np_log2andtotalandH3
+Normalised_NP_log2andNONO
+Normalised_NP_totalandlog2andNONO
+Normalised_Np_log2andtotalandNONO
+Normalised_NP_totalandlog2andNONOziji
+Normalised_Np_log2andtotalandNONOziji
+
+```{r}
+Normalised_Np_log2andtotalandH3_df_long <- Normalised_NP_totalandlog2 %>%
+  pivot_longer(cols = starts_with("NP"), names_to = "Variable", values_to = "Value")
+
+# Create a column to identify the biological replicate
+Normalised_Np_log2andtotalandH3_df_long <- Normalised_Np_log2andtotalandH3_df_long %>%
+  mutate(Replicate = case_when(
+    Variable %in% c("NP_R1_P", "NP_R1_5", "NP_R1_6") ~ "Replicate1",
+    Variable %in% c("NP_R2_P", "NP_R2_5", "NP_R2_6") ~ "Replicate2",
+    Variable %in% c("NP_R3_P", "NP_R3_5", "NP_R3_6") ~ "Replicate3"
+  ))
+
+# Create a column to identify the treatment
+Normalised_Np_log2andtotalandH3_df_long <- Normalised_Np_log2andtotalandH3_df_long %>%
+  mutate(Treatment = case_when(
+    Variable %in% c("NP_R1_P", "NP_R2_P", "NP_R3_P") ~ "Pclip",
+    Variable %in% c("NP_R1_5", "NP_R2_5", "NP_R3_5") ~ "Clone5",
+    Variable %in% c("NP_R1_6", "NP_R2_6", "NP_R3_6") ~ "Clone6"
+  ))
+
+
+
+
+# Filter for the control and drug treatment 1
+df_NP_Clone5 <- Normalised_Np_log2andtotalandH3_df_long %>%
+  filter(Treatment %in% c("Pclip", "Clone5"))
+
+
+df_NP_Clone5 <- df_NP_Clone5 %>%
+  mutate_all(~ ifelse(is.infinite(.), NA, .))
+
+df_NP_Clone5 <- df_NP_Clone5 %>%
+  group_by(Gene, Treatment) %>%
+  filter(sum(is.na(Value)) < 2) %>%
+  ungroup() %>%
+  group_by(Gene) %>%
+  filter(n_distinct(Treatment) == 2)
+
+
+# Calculate the mean difference and p-values for each category
+resultsforNPclone5 <- df_NP_Clone5 %>%
+  group_by(Gene) %>%
+  summarise(
+    mean_Pclip = mean(Value[Treatment == "Pclip"], na.rm = TRUE),
+    mean_Clone5 = mean(Value[Treatment == "Clone5"], na.rm = TRUE),
+    mean_difference = mean_Clone5 - mean_Pclip,
+    p_value = {
+      Pclip_values <- Value[Treatment == "Pclip"]
+      Clone5_values <- Value[Treatment == "Clone5"]
+      # Remove NA values before performing t-test
+      t.test(Pclip_values, Clone5_values, na.rm = TRUE)$p.value
+    }
+  )
+
+# Print the results
+print(resultsforNPclone5)
+
+filtered_Pvalue_resultsforNPclone5 <- resultsforNPclone5 %>%
+  filter(p_value < 0.05)
+
+filtered_Pvalue_resultsforNPclone5dayu0 <- resultsforNPclone5 %>%
+  filter(mean_difference > 0)
+
+
+filtered_Pvalue_resultsforNPclone5_biggerthan0.58 <- filtered_Pvalue_resultsforNPclone5 %>%
+  filter(mean_difference > 0.5)
+
+view(filtered_Pvalue_resultsforNPclone5_biggerthan0.58)
+
+filtered_Pvalue_resultsforNPclone5_smallerthanfu0.58 <- filtered_Pvalue_resultsforNPclone5 %>%
+  filter(mean_difference < -0.5)
+
+view(filtered_Pvalue_resultsforNPclone5_smallerthanfu0.58)
+
+
+df_NP_Clone6 <- Normalised_Np_log2andtotalandH3_df_long %>%
+  filter(Treatment %in% c("Pclip", "Clone6"))
+
+
+df_NP_Clone6 <- df_NP_Clone6 %>%
+  mutate_all(~ ifelse(is.infinite(.), NA, .))
+
+df_NP_Clone6 <- df_NP_Clone6 %>%
+  group_by(Gene, Treatment) %>%
+  filter(sum(is.na(Value)) < 2) %>%
+  ungroup() %>%
+  group_by(Gene) %>%
+  filter(n_distinct(Treatment) == 2)
+
+
+# Calculate the mean difference and p-values for each category
+resultsforNPclone6 <- df_NP_Clone6 %>%
+  group_by(Gene) %>%
+  summarise(
+    mean_Pclip = mean(Value[Treatment == "Pclip"], na.rm = TRUE),
+    mean_Clone6 = mean(Value[Treatment == "Clone6"], na.rm = TRUE),
+    mean_difference = mean_Clone6 - mean_Pclip,
+    p_value = {
+      Pclip_values <- Value[Treatment == "Pclip"]
+      Clone6_values <- Value[Treatment == "Clone6"]
+      # Remove NA values before performing t-test
+      t.test(Pclip_values, Clone6_values, na.rm = TRUE)$p.value
+    }
+  )
+
+# Print the results
+print(resultsforNPclone6)
+
+filtered_Pvalue_resultsforNPclone6 <- resultsforNPclone6 %>%
+  filter(p_value < 0.05)
+
+view(filtered_Pvalue_resultsforNPclone5)
+view(filtered_Pvalue_resultsforNPclone6)
+
+filtered_Pvalue_resultsforNPclone6_biggerthan0.58 <- filtered_Pvalue_resultsforNPclone6 %>%
+  filter(mean_difference > 0.5)
+
+view(filtered_Pvalue_resultsforNPclone6_biggerthan0.58)
+
+filtered_Pvalue_resultsforNPclone6_smallerthanfu0.58 <- filtered_Pvalue_resultsforNPclone6 %>%
+  filter(mean_difference < -0.5)
+
+view(filtered_Pvalue_resultsforNPclone6_smallerthanfu0.58)
+
+```
+```{r}
+
+
+library(dplyr)
+
+gene_inNPC5_biggerthan0.5 <- NI_mass_spectrum %>%
+  filter(`gene symbol` %in% filtered_Pvalue_resultsforNPclone5_biggerthan0.58$Gene)
+
+gene_inNPC5_biggerthan0.5$NC_pclip_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NC_R1_P", "NC_R2_P", "NC_R3_P")], na.rm = TRUE)
+
+# Calculating the mean for NC_clone5
+gene_inNPC5_biggerthan0.5$NC_clone5_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NC_R1_5", "NC_R2_5", "NC_R3_5")], na.rm = TRUE)
+
+# Calculating the mean for NC_clone6
+gene_inNPC5_biggerthan0.5$NC_clone6_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NC_R1_6", "NC_R2_6", "NC_R3_6")], na.rm = TRUE)
+
+gene_inNPC5_biggerthan0.5$NP_pclip_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NP_R1_P", "NP_R2_P", "NP_R3_P")], na.rm = TRUE)
+
+
+gene_inNPC5_biggerthan0.5$NP_clone5_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NP_R1_5", "NP_R2_5", "NP_R3_5")], na.rm = TRUE)
+
+
+gene_inNPC5_biggerthan0.5$NP_clone6_mean <- rowMeans(gene_inNPC5_biggerthan0.5[, c("NP_R1_6", "NP_R2_6", "NP_R3_6")], na.rm = TRUE)
+
+gene_inNPC5_biggerthan0.5$pclip_NPNC_ratio <- gene_inNPC5_biggerthan0.5$NP_pclip_mean / gene_inNPC5_biggerthan0.5$NC_pclip_mean
+
+
+gene_inNPC5_biggerthan0.5$Clone5_NPNC_ratio <- gene_inNPC5_biggerthan0.5$NP_clone5_mean / gene_inNPC5_biggerthan0.5$NC_clone5_mean
+
+gene_inNPC5_biggerthan0.5$Clone6_NPNC_ratio <- gene_inNPC5_biggerthan0.5$NP_clone6_mean / gene_inNPC5_biggerthan0.5$NC_clone6_mean
+
+gene_inNPC5_biggerthan0.5$pclip_NPNC_ratio <- round(gene_inNPC5_biggerthan0.5$pclip_NPNC_ratio, 4)
+gene_inNPC5_biggerthan0.5$Clone5_NPNC_ratio <- round(gene_inNPC5_biggerthan0.5$Clone5_NPNC_ratio, 4)
+gene_inNPC5_biggerthan0.5$Clone6_NPNC_ratio <- round(gene_inNPC5_biggerthan0.5$Clone6_NPNC_ratio, 4)
+
+# Display the updated dataframe
+print(gene_inNPC5_biggerthan0.5)
+
+gene_inNPC5_biggerthan0.5 <- gene_inNPC5_biggerthan0.5 %>%
+  group_by(`gene symbol`) %>%
+  filter(!(`gene symbol` == "TMPO" & row_number() == 1)) %>%
+  ungroup()
+
+
+NPNC_proteinratio_clone5_totalandlog2 <- data.frame(
+  Gene = gene_inNPC5_biggerthan0.5$`gene symbol`, 
+  log2_mean_difference = filtered_Pvalue_resultsforNPclone5_biggerthan0.58$mean_difference,
+  P_value = filtered_Pvalue_resultsforNPclone5_biggerthan0.58$p_value,
+  pclip_NPNC_ratio = gene_inNPC5_biggerthan0.5$pclip_NPNC_ratio, 
+  Clone5_NPNC_ratio = gene_inNPC5_biggerthan0.5$Clone5_NPNC_ratio, 
+  Clone6_NPNC_ratio = gene_inNPC5_biggerthan0.5$Clone6_NPNC_ratio
+)
+View(NPNC_proteinratio_clone5_totalandlog2)
+
+
+
+
+gene_inNPC6_biggerthan0.5 <- NI_mass_spectrum %>%
+  filter(`gene symbol` %in% filtered_Pvalue_resultsforNPclone6_biggerthan0.58$Gene)
+
+gene_inNPC6_biggerthan0.5$NC_pclip_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NC_R1_P", "NC_R2_P", "NC_R3_P")], na.rm = TRUE)
+
+# Calculating the mean for NC_clone5
+gene_inNPC6_biggerthan0.5$NC_clone5_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NC_R1_5", "NC_R2_5", "NC_R3_5")], na.rm = TRUE)
+
+# Calculating the mean for NC_clone6
+gene_inNPC6_biggerthan0.5$NC_clone6_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NC_R1_6", "NC_R2_6", "NC_R3_6")], na.rm = TRUE)
+
+gene_inNPC6_biggerthan0.5$NP_pclip_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NP_R1_P", "NP_R2_P", "NP_R3_P")], na.rm = TRUE)
+
+
+gene_inNPC6_biggerthan0.5$NP_clone5_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NP_R1_5", "NP_R2_5", "NP_R3_5")], na.rm = TRUE)
+
+
+gene_inNPC6_biggerthan0.5$NP_clone6_mean <- rowMeans(gene_inNPC6_biggerthan0.5[, c("NP_R1_6", "NP_R2_6", "NP_R3_6")], na.rm = TRUE)
+
+gene_inNPC6_biggerthan0.5$pclip_NPNC_ratio <- gene_inNPC6_biggerthan0.5$NP_pclip_mean / gene_inNPC6_biggerthan0.5$NC_pclip_mean
+
+
+gene_inNPC6_biggerthan0.5$Clone5_NPNC_ratio <- gene_inNPC6_biggerthan0.5$NP_clone5_mean / gene_inNPC6_biggerthan0.5$NC_clone5_mean
+
+gene_inNPC6_biggerthan0.5$Clone6_NPNC_ratio <- gene_inNPC6_biggerthan0.5$NP_clone6_mean / gene_inNPC6_biggerthan0.5$NC_clone6_mean
+
+gene_inNPC6_biggerthan0.5$pclip_NPNC_ratio <- round(gene_inNPC6_biggerthan0.5$pclip_NPNC_ratio, 4)
+gene_inNPC6_biggerthan0.5$Clone5_NPNC_ratio <- round(gene_inNPC6_biggerthan0.5$Clone5_NPNC_ratio, 4)
+gene_inNPC6_biggerthan0.5$Clone6_NPNC_ratio <- round(gene_inNPC6_biggerthan0.5$Clone6_NPNC_ratio, 4)
+
+# Display the updated dataframe
+print(gene_inNPC6_biggerthan0.5)
+
+NPNC_proteinratio_clone6_totalandlog2 <- data.frame(
+  Gene = gene_inNPC6_biggerthan0.5$`gene symbol`, 
+  log2_mean_difference = filtered_Pvalue_resultsforNPclone6_biggerthan0.58$mean_difference,
+  P_value = filtered_Pvalue_resultsforNPclone6_biggerthan0.58$p_value,
+  pclip_NPNC_ratio = gene_inNPC6_biggerthan0.5$pclip_NPNC_ratio, 
+  Clone5_NPNC_ratio = gene_inNPC6_biggerthan0.5$Clone5_NPNC_ratio, 
+  Clone6_NPNC_ratio = gene_inNPC6_biggerthan0.5$Clone6_NPNC_ratio
+)
+View(NPNC_proteinratio_clone6_totalandlog2)
+
+write_xlsx(NPNC_proteinratio_clone5_totalandlog2, "C:\\Users\\Junqi Pan\\OneDrive\\Desktop\\NPNC ratio clone5 totalandlog2andH3.xlsx")
+
+write_xlsx(NPNC_proteinratio_clone6_totalandlog2, "C:\\Users\\Junqi Pan\\OneDrive\\Desktop\\NPNC ratio clone6 totalandlog2andH3.xlsx")
+
+
+
+```
+
+
+```{r}
+resultsforNPclone5<- resultsforNPclone5 %>%
+  mutate(expression = NA)
+
+
+resultsforNPclone5$expression = ifelse(resultsforNPclone5$p_value < 0.05 & abs(resultsforNPclone5$mean_difference) >= 0.58, 
+                     ifelse(resultsforNPclone5$mean_difference> 0.58,'Up','Down'),
+                     'Stable')
+
+label_data =filter(resultsforNPclone5,((resultsforNPclone5$p_value < 0.05 ) &( abs(resultsforNPclone5$mean_difference)>= 1)))[1:20,]
+
+NPclone5test <- ggplot(data = resultsforNPclone5, 
+            aes(x = mean_difference, 
+                y = -log10(p_value), 
+                colour=expression,
+                label = Gene)) +
+  geom_point(alpha=0.9, size=2.2) +
+  scale_color_manual(values=c("blue", "grey","red"))+
+  xlim(c(-4.5, 4.5)) +
+  geom_vline(xintercept=c(-0.58,0.58),lty=4,col="black",lwd=0.8) +
+  geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
+  labs(x="log2(fold change)",
+       y="-log10 (adj.p-value)",
+       title="Nucleoplasm grDNA#5 Differential expression")  +
+  theme_bw()+
+  geom_label_repel(data = label_data,
+                   box.padding = 0.3,
+                   point.padding =0.1,
+                   min.segment.length = 0.05,
+                   segment.size =0.2,
+                   firce =1.2,
+                   max.overlap = 5000,
+                   size =2,
+                   show.legend = FALSE )  + 
+                
+  scale_x_continuous(limits = c(-3,3), breaks = seq(-3, 3, by = 1))+
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position="right", 
+        legend.title = element_blank(),
+        panel.grid = element_blank(),
+        axis.title.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.title.y =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.y =  element_text(face = "bold", colour = "black",size =10))
+
+
+print(NPclone5test)
+
+
+
+
+resultsforNPclone6<- resultsforNPclone6 %>%
+  mutate(expression = NA)
+
+
+resultsforNPclone6$expression = ifelse(resultsforNPclone6$p_value < 0.05 & abs(resultsforNPclone6$mean_difference) >= 0.58, 
+                     ifelse(resultsforNPclone6$mean_difference> 0.58,'Up','Down'),
+                     'Stable')
+
+label_data =filter(resultsforNPclone6,((resultsforNPclone6$p_value < 0.05 ) &( abs(resultsforNPclone6$mean_difference)>= 1)))[1:20,]
+
+NPclone6test <- ggplot(data = resultsforNPclone6, 
+            aes(x = mean_difference, 
+                y = -log10(p_value), 
+                colour=expression,
+                label = Gene)) +
+  geom_point(alpha=0.9, size=2.2) +
+  scale_color_manual(values=c("blue", "grey","red"))+
+  xlim(c(-4.5, 4.5)) +
+  geom_vline(xintercept=c(-0.58,0.58),lty=4,col="black",lwd=0.8) +
+  geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
+  labs(x="log2(fold change)",
+       y="-log10 (adj.p-value)",
+       title="Nucleoplasm grDNA#6 Differential expression")  +
+  theme_bw()+
+  geom_label_repel(data = label_data,
+                   box.padding = 0.3,
+                   point.padding =0.1,
+                   min.segment.length = 0.05,
+                   segment.size =0.2,
+                   firce =1.2,
+                   max.overlap = 5000,
+                   size =2,
+                   show.legend = FALSE )  + 
+                
+  scale_x_continuous(limits = c(-3,3), breaks = seq(-3, 3, by = 1))+
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position="right", 
+        legend.title = element_blank(),
+        panel.grid = element_blank(),
+        axis.title.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.title.y =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.x =  element_text(face = "bold", colour = "black",size =10),
+         axis.text.y =  element_text(face = "bold", colour = "black",size =10))
+
+
+
+
+print(NPclone6test)
+
+ggsave( "Volcano plot for Nucleoplasm C5 total log2 .tiff", plot = NPclone5test, width = 9 , height =6, dpi = 1500)
+
+ggsave( "Volcano plot for Nucleoplasm C6 total log2 .tiff", plot = NPclone6test, width = 9 , height =6, dpi = 1500)
+
+```
+
+
+ggsave( "Volcano plot for Nucleoplasm C5 total log2 H3 .tiff", plot = NPclone5test, width = 9 , height =6, dpi = 1500)
+
+ggsave( "Volcano plot for Nucleoplasm C6 total log2 H3.tiff", plot = NPclone6test, width = 9 , height =6, dpi = 1500)
+
+
+
+ggsave( "Volcano plot for Nucleoplasm C5 total log2 H3 .tiff", plot = NPclone5test, width = 9 , height =6, dpi = 1500)
+
+ggsave( "Volcano plot for Nucleoplasm C6 total log2 H3.tiff", plot = NPclone6test, width = 9 , height =6, dpi = 1500)
+
+
+
+
